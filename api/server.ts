@@ -24,7 +24,11 @@ const invoices: Invoice[] = [
     status: 'pending',
     issueDate: '2026-06-01',
     dueDate: '2026-06-15',
-    customer: { id: 1, name: 'Construtora Meridiano', email: 'contato@meridiano.com.br' },
+    customer: {
+      id: 1,
+      name: 'Construtora Meridiano',
+      email: 'contato@meridiano.com.br',
+    },
   },
   {
     id: 2,
@@ -32,7 +36,11 @@ const invoices: Invoice[] = [
     status: 'paid',
     issueDate: '2026-05-12',
     dueDate: '2026-06-11',
-    customer: { id: 1, name: 'Construtora Meridiano', email: 'contato@meridiano.com.br' },
+    customer: {
+      id: 1,
+      name: 'Construtora Meridiano',
+      email: 'contato@meridiano.com.br',
+    },
   },
   {
     id: 3,
@@ -40,29 +48,31 @@ const invoices: Invoice[] = [
     status: 'pending',
     issueDate: '2026-06-20',
     dueDate: '2026-07-20',
-    customer: { id: 2, name: 'Gráfica Aurora', email: 'contato@graficaaurora.com.br' },
+    customer: {
+      id: 2,
+      name: 'Gráfica Aurora',
+      email: 'contato@graficaaurora.com.br',
+    },
   },
 ];
 
-
 const app = express();
 
-app.use(function (request, response, next) {
-    console.log(request.method + ' ' + request.url);
-    next();
-
+app.use((request, _response, next) => {
+  console.log(`${request.method} ${request.url}`);
+  next();
 });
 
-app.get('/api/health', function (request, response) {
-    response.status(200).json({ status: 'ok'});
+app.get('/api/health', (_request, response) => {
+  response.status(200).json({ status: 'ok' });
 });
 
-app.get('/api/invoices', function (requeste, response) {
-    response.status(200).json(invoices);
-})
+app.get('/api/invoices', (_requeste, response) => {
+  response.status(200).json(invoices);
+});
 
-app.use(function (request, response) {
-     response.status(404).json({ message: 'Recurso não encontrado'});
+app.use((_request, response) => {
+  response.status(404).json({ message: 'Recurso não encontrado' });
 });
 
 app.listen(3000);
