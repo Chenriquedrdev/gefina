@@ -1,5 +1,7 @@
 import express from 'express';
 
+import path from 'node:path';
+
 type InvoiceStatus = 'pending' | 'paid';
 
 interface Customer {
@@ -58,6 +60,8 @@ const invoices: Invoice[] = [
 
 const app = express();
 
+const dist = path.join(import.meta.dirname, '..', 'web', 'dist');
+
 app.use((request, _response, next) => {
   console.log(`${request.method} ${request.url}`);
   next();
@@ -66,6 +70,10 @@ app.use((request, _response, next) => {
 app.get('/api/health', (_request, response) => {
   response.status(200).json({ status: 'ok' });
 });
+
+app.use('/api/invoices', invoices);
+
+app.use(express.static(dist));
 
 app.get('/api/invoices', (_requeste, response) => {
   response.status(200).json(invoices);
