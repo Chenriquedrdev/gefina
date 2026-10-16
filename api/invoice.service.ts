@@ -38,10 +38,10 @@ const baseQuery = `
     invoices.status,
     CASE
      WHEN status = 'paid' THEN 'paid'
-     WHEN invoices.due_date < CURRENTE_DATE THEN 'overdue'
+     WHEN invoices.due_date < CURRENT_DATE THEN 'overdue'
      ELSE 'pending'
     END AS situation,
-    invoices.issue_date::text;
+    invoices.issue_date::text,
     invoices.due_date::text,
     customers.id AS customer_id,
     customers.name AS customer_name,
@@ -68,6 +68,7 @@ function toInvoice(row: InvoiceRow): Invoice {
 
 export async function findAllInvoices(): Promise<Invoice[]> {
   const connect = await pool.query<InvoiceRow>(`${baseQuery} ORDER BY invoices.issue_date DESC;`);
+  console.log('SQL EXECUTADO', connect);
 
   const invoices: Invoice[] = [];
 
