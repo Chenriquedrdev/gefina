@@ -1,9 +1,8 @@
 {
   "name": "gefina",
   "version": "0.1.0",
-  "descripition": "Sistema de gestão de contas a receber.",
-  "author": "Henrique Rocha",
-
+  "description": "Sistema de gestão de contas a receber.",
+  "author": "Alex Bessa",
   "scripts": {
     "check": "biome check ./",
     "fix": "biome check --write ./",

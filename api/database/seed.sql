@@ -1,4 +1,3 @@
-
 -- Dados fictícios para o ambiente de desenvolvimento.
 -- Pode ser executado mais de uma vez: esvazia as tabelas antes de inserir.
 
