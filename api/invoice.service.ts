@@ -49,7 +49,7 @@ const baseQuery=`
     customers.email AS customer_email
   FROM invoices
   JOIN customers
-  ON customers.id = invoices.customer_id;
+  ON customers.id = invoices.customer_id
   `;
 
   function toInvoice(row:InvoiceRow): Invoice {
@@ -90,22 +90,23 @@ return toInvoice(connect.rows[0]);
 }
 
 export async function findRecentInvoices(): Promise<Invoice[]> {
-const connect = await pool.query<InvoiceRow>(`
-  ${baseQuery}
-  ORDER BY invoices.creatd_at DESC
-  LIMIT 5;
+  const connect = await pool.query<InvoiceRow>(`
+    ${baseQuery}
+    ORDER BY invoices.issue_date DESC
+    LIMIT 5;
   `);
-return toInvoices(connect.rows);
 
-
+  return toInvoices(connect.rows);
 }
 
 export async function findOverdueInvoices(): Promise<Invoice[]> {
   const connect = await pool.query<InvoiceRow>(`
-  ${baseQuery}
-  WHERE invoices.status = 'pending' AND invoices.due_date ,< CURRENT_DATE ORDE BY invoices.creatd.at
-  ORDER BY invoices.due_date
-  LIMIT 5;
+    ${baseQuery}
+    WHERE invoices.status = 'pending'
+      AND invoices.due_date < CURRENT_DATE
+    ORDER BY invoices.due_date ASC
+    LIMIT 5;
   `);
+
   return toInvoices(connect.rows);
 }
