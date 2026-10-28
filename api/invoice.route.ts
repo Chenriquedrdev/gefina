@@ -16,7 +16,7 @@ function parseId(value: string): number | undefined {
   if (!Number.isInteger(id) || id < 1) return undefined;
 
   return id;
-} 
+}
 
 router.get('/', async (_request, response) => {
   const invoices = await findAllInvoices();
@@ -110,6 +110,6 @@ router.delete('/:id', async (request, response) => {
   });
 
   response.status(204).end();
-})
+});
 
 export default router;
