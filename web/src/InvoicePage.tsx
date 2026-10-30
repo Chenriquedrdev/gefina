@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import type { Invoice, InvoiceInput } from './invoiceType.ts';
 import InvoiceTable from './invoiceTable.tsx';
@@ -14,20 +14,34 @@ export default function InvoicePage() {
     const [busy, setBusy] = useState(false);
     const [formError, setFormError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [dialogContent, setDialogContent] = useState(false);
+
+    const dialogRef = useRef<HTMLDialogElement>(null);
+
+    function openModal() {
+        setFormError(null);
+        setDialogContent(true);
+
+        dialogRef.current?.showModal();
+    }
+
+    function closeModal() {
+        setFormError(null);
+
+        dialogRef.current?.close();
+    }
 
     useEffect(() => {
         async function getInvoices() {
             try {
-               const datas = await getAllInvoices();
-               setInvoices(datas);            
+                const datas = await getAllInvoices();
+                setInvoices(datas);
             } catch (error) {
                 if (error instanceof Error) setError(error.message);
-              
             }
 
             setLoading(false);
         }
-        
         getInvoices();
     }, []);
 
@@ -41,61 +55,69 @@ export default function InvoicePage() {
                 const datas = await response.json();
 
                 setCustomersOptions(datas);
-
             } catch (error) {
-                if(error instanceof Error) setError(error.message);
-
+                if (error instanceof Error) setError(error.message);
             }
-
         }
 
         getCustomersOptions();
     }, []);
 
     async function refresh() {
-        
-            try {
-                const datas = await getAllInvoices();
-                setInvoices(datas);
-
-            } catch (error) {
-                if(error instanceof Error) setError(error.message);
-            }
+        try {
+            const datas = await getAllInvoices();
+            setInvoices(datas);
+        } catch (error) {
+            if (error instanceof Error) throw error;
         }
+    }
 
     async function submit(datas: InvoiceInput) {
         setBusy(true);
         setFormError(null);
-        
-            try {
-               await createInvoice(datas);
-               await refresh();
 
-            } catch (error) {
-                if(error instanceof Error) setFormError(error.message);
-            }
-            setBusy(false)
+        try {
+            await createInvoice(datas);
+            closeModal();
+            await refresh();
+        } catch (error) {
+            if (error instanceof Error) setFormError(error.message);
         }
-    if (loading) return <p>Carregando faturas...</p>
+
+        setBusy(false);
+    }
+
+    if (loading) return <p>Carregando faturas...</p>;
 
     if (error) return <p>{error}</p>;
-    
+
     return <>
-        <h1>Faturas</h1>
+        <header className='page-header'>
+            <h1>Faturas</h1>
+            <button
+                className='button-primary'
+                onClick={openModal}
+            >Nova fatura</button>
+        </header>
 
         <div className='panel'>
             <InvoiceTable invoices={invoices} />
         </div>
 
-        <InvoiceTable invoices={invoices} />
-        <InvoiceForm
-        invoice={null}
-        customers={customersOptions}
-        error={formError}
-        onDelete={() => null}
-        onCancel={() => null}
-        onSubmit={submit}
-        busy={busy}
-        />
+        <dialog
+            className='invoice-modal'
+            ref={dialogRef}
+            onClose={() => setDialogContent(false)}
+        >
+            {dialogContent && <InvoiceForm
+                invoice={null}
+                customers={customersOptions}
+                error={formError}
+                onDelete={() => null}
+                onCancel={closeModal}
+                onSubmit={submit}
+                busy={busy}
+            />}
+        </dialog>
     </>
 }

@@ -18,49 +18,52 @@ export default function DashboardPage() {
                 const response = await fetch('/api/dashboard');
 
                 if (!response.ok) {
-                    setError('Não foi possível carregar faturas.');
+                    setError('Não foi possível carregar o painel inicial.');
                     setLoading(false);
-                    return;
+                    return
                 }
 
                 const datas = await response.json();
-                setDashboard(datas);                
-            } catch {
-                setError('Não foi possível carregar faturas.');
+                setDashboard(datas);
+            } catch (error) {
+                console.error(error);
+
+                setError('Não foi possível carregar o painel inicial.');
             }
 
             setLoading(false);
         }
-        
+
         getDashboard();
     }, []);
 
-    if (loading) return <p>Carregando painel inicial...</p>
+    if (loading) return <p>Carregando painel incial...</p>
 
-    if (error || dashboard === null) return <p>{error}</p>;
-    
-    return <>
+    if (error !== null || dashboard === null) return <p>{error}</p>
+
+    return <div>
         <h1>Painel Inicial</h1>
 
-        <div>
-            <SummaryCard label='Total recebido:' value={formatCurrency(dashboard.totals.paid)} />
-            <SummaryCard label='Total pendente:' value={formatCurrency(dashboard.totals.pending)} />
-            <SummaryCard label='Faturas:' value={String(dashboard.totals.invoiceCount)} />
-            <SummaryCard label='Clientes' value={String(dashboard.totals.customerCount)} />
+        <div className='summary-cards'>
+            <SummaryCard label='Total recebido: ' value={formatCurrency(dashboard.totals.paid)} />
+            <SummaryCard label='Total pendente: ' value={formatCurrency(dashboard.totals.pending)} />
+            <SummaryCard label='Faturas: ' value={String(dashboard.totals.invoiceCount)} />
+            <SummaryCard label='Clientes: ' value={String(dashboard.totals.customerCount)} />
         </div>
 
-        <InvoiceSummaryTable
-            title='Faturas recentes'
-            dateLabel='Emissão'
-            invoices={dashboard.recentInvoices}
-            date={(invoice) => invoice.issueDate}
-        />
-
-        <InvoiceSummaryTable
-            title='Faturas atrasadas'
-            dateLabel='Vencimento'
-            invoices={dashboard.overdueInvoices}
-            date={(invoice) => invoice.dueDate}
-        />
-    </>;
+        <div className='summary-tables'>
+            <InvoiceSummaryTable
+                title='Faturas Recentes'
+                dateLabel='Emissão'
+                invoices={dashboard.recentInvoices}
+                date={(invoice) => invoice.issueDate}
+            />
+            <InvoiceSummaryTable
+                title='Faturas Atrasadas'
+                dateLabel='Vencimento'
+                invoices={dashboard.overdueInvoices}
+                date={(invoice) => invoice.dueDate}
+            />
+        </div>
+    </div>;
 }
