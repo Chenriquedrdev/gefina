@@ -1,28 +1,33 @@
-import type { Invoice } from './invoiceType.ts';
-import InvoiceRow from './invoiceRow.tsx';
+import InvoiceRow from './InvoiceRow.tsx';
+import { Invoice } from './invoiceType.ts';
 
 interface InvoiceTableProps {
     invoices: Invoice[];
+    edit: (invoice: Invoice) => void;
 }
 
 export default function InvoiceTable(props: InvoiceTableProps) {
+    const invoices = props.invoices;
+
     return <table>
         <thead>
             <tr>
                 <th>Cliente</th>
                 <th>Valor</th>
-                <th>Data de Emissão</th>
-                <th>Data de Vencimento</th>
+                <th className='numeric-date'>Data de Emissão</th>
+                <th className='numeric-date'>Data de Vencimento</th>
                 <th>Situação</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
-            {props.invoices.map(invoice => (
+            {invoices.map(invoice => (
                 <InvoiceRow
                     key={invoice.id}
                     invoice={invoice}
+                    edit={props.edit}
                 />
             ))}
         </tbody>
-    </table>;
-}
+    </table>
+} 

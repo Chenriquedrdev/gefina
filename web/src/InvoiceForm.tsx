@@ -1,18 +1,20 @@
-import { useState, type SubmitEvent } from 'react';
+import { useState, SubmitEvent, SetStateAction } from 'react';
 
-import type { Invoice, InvoiceStatus, InvoiceInput } from './invoiceType.ts';
-import type { CustomerOption } from './customerType.ts';
+import { Invoice, InvoiceInput, InvoiceStatus } from './invoiceType.ts';
+import { CustomerOption } from './customerType.ts';
 
 interface InvoiceFormProps {
     invoice: Invoice | null;
     customers: CustomerOption[];
     error: string | null;
+    confirmDelete: boolean;
+    setConfirmDelete: React.Dispatch<SetStateAction<boolean>>;
+    confirm: () => void;
     onDelete: () => void;
     onCancel: () => void;
     onSubmit: (values: InvoiceInput) => void;
     busy: boolean;
 }
-
 
 export default function InvoiceForm(props: InvoiceFormProps) {
     const [customerId, setCustomerId] = useState(!props.invoice ? '' : props.invoice.customer.id);
@@ -23,6 +25,7 @@ export default function InvoiceForm(props: InvoiceFormProps) {
 
     const handleSubmit = (event: SubmitEvent) => {
         event.preventDefault();
+        props.setConfirmDelete(false);
 
         props.onSubmit({
             customerId: Number(customerId),
@@ -91,6 +94,7 @@ export default function InvoiceForm(props: InvoiceFormProps) {
                 <input
                     id='dueDate'
                     type='date'
+                    min={issueDate}
                     value={dueDate}
                     onChange={(event) => setDueDate(event.target.value)}
                     required
@@ -102,10 +106,11 @@ export default function InvoiceForm(props: InvoiceFormProps) {
 
         <div className='form-actions'>
             {!props.invoice ? null : <button
+                className='button-danger'
                 type='button'
                 onClick={props.onDelete}
                 disabled={props.busy}
-            >Excluir</button>}
+            >{props.busy && props.confirmDelete? 'Excluindo...' : 'Excluir'}</button>}
             <button
                 className='button-secondary'
                 type='button'
@@ -116,7 +121,23 @@ export default function InvoiceForm(props: InvoiceFormProps) {
                 className='button-primary'
                 type='submit'
                 disabled={props.busy}
-            >{props.busy ? 'Salvando...' : 'Salvar'}</button>
+            >{props.busy && !props.confirmDelete ? 'Salvando...' : 'Salvar'}</button>
         </div>
+
+        {props.confirmDelete && <div className='confirm-form'>
+            <p>A exclusão é definitiva e não pode ser desfeita. Deseja prosseguir?</p>
+            <button
+                className='button-secondary'
+                type='button'
+                onClick={() => props.setConfirmDelete(false)}
+                disabled={props.busy}
+            >Não</button>
+            <button
+                className='button-danger'
+                type='button'
+                onClick={props.confirm}
+                disabled={props.busy}
+            >Sim</button>
+        </div>}
     </form>;
 }
