@@ -4,12 +4,7 @@ import { Invoice,InvoiceInput } from './invoiceType.ts';
 import InvoiceTable from './invoiceTable.tsx';
 import InvoiceForm from './InvoiceForm.tsx';
 
-import {
-    getAllInvoices,
-    createInvoice,
-    updateInvoice,
-    deleteInvoice
-} from './InvoiceApi.ts';
+import { getAllInvoices,  createInvoice, updateInvoice, deleteInvoice} from './InvoiceApi.ts';
 import { CustomerOption } from './customerType.ts';
 
 export default function InvoicePage() {
@@ -20,7 +15,7 @@ export default function InvoicePage() {
     const [formError, setFormError] = useState<string | null>(null); 
     const [loading, setLoading] = useState(true);
     const [dialogContent, setDialogContent] = useState(false);
-    const [target, setTarget] = useState<invoice | null>(null);
+    const [target, setTarget] = useState<Invoice | null>(null);
     const [confirmDelete, setConfirmDelete] = useState(false);
 
     const dialogRef = useRef<HTMLDialogElement>(null);
@@ -143,7 +138,7 @@ export default function InvoicePage() {
             ref={dialogRef}
             onClose={() => {
                 setDialogContent(false);
-                setConfirmDelete(false);
+                setConfirmDelete(false); 
             }}
         >
             {dialogContent && <InvoiceForm

@@ -1,6 +1,6 @@
 import { useState, SubmitEvent, SetStateAction } from 'react';
 
-import { Invoice, InvoiceInput, InvoiceStatus } from './invoiceType.ts';
+import { Invoice, InvoiceInput, invoiceStatus } from './invoiceType.ts';
 import { CustomerOption } from './customerType.ts';
 
 interface InvoiceFormProps {
@@ -19,7 +19,7 @@ interface InvoiceFormProps {
 export default function InvoiceForm(props: InvoiceFormProps) {
     const [customerId, setCustomerId] = useState(!props.invoice ? '' : props.invoice.customer.id);
     const [amount, setAmount] = useState(!props.invoice ? '' : (props.invoice.amount / 100).toFixed(2));
-    const [status, setStatus] = useState<InvoiceStatus>(!props.invoice ? 'pending' : props.invoice.status);
+    const [status, setStatus] = useState<invoiceStatus>(!props.invoice ? 'pending' : props.invoice.status);
     const [issueDate, setIssueDate] = useState(!props.invoice ? '' : props.invoice.issueDate);
     const [dueDate, setDueDate] = useState(!props.invoice ? '' : props.invoice.dueDate);
 
@@ -126,6 +126,7 @@ export default function InvoiceForm(props: InvoiceFormProps) {
 
         {props.confirmDelete && <div className='confirm-form'>
             <p>A exclusão é definitiva e não pode ser desfeita. Deseja prosseguir?</p>
+
             <button
                 className='button-secondary'
                 type='button'
