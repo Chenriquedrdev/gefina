@@ -1,5 +1,6 @@
 import pool from './database.ts';
 
+import{ InvoiceStatus, InvoiceInput } from './invoice.schema.ts'
 export type InvoiceStatus = 'paid' | 'pending';
 type InvoiceSituation = 'paid' | 'pending' | 'overdue';
 
@@ -29,14 +30,6 @@ interface InvoiceRow {
   customer_id: number;
   customer_name: string;
   customer_email: string;
-}
-
-interface InvoiceInput {
-  customerId: number;
-  amount: number;
-  status: InvoiceStatus;
-  issueDate: string;
-  dueDate: string;
 }
 
 const baseQuery = `
