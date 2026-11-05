@@ -1,3 +1,5 @@
+import { z, type ZodError } from 'zod';
+
 const invoiceStatusSchema = z.enum(
     [
         'paid',
@@ -6,13 +8,16 @@ const invoiceStatusSchema = z.enum(
     'A situação informada é inválida. Os valores permitidos são "Paga" e "Pendente".'
 );
 
-type InvoiceStatus = z.infer<typeof invoiceStatusSchema>;
+export type InvoiceStatus = z.infer<typeof invoiceStatusSchema>;
 
 export const invoiceSchema = z
     .object(
         {
             customerId: z
                 .number('O cliente é obrigatório.')
+                .refine((id) => !Number.isNaN(id), {
+                    message: 'O cliente é obrigatório.'
+                })
                 .int('O identificador do cliente deve ser um número inteiro.')
                 .positive('O identificador do cliente deve ser maior que zero.'),
             amount: z
@@ -23,14 +28,13 @@ export const invoiceSchema = z
             issueDate: z.iso.date('A data de emissão deve ser uma data válida.'),
             dueDate: z.iso.date('A data de vencimento deve ser uma data válida.')
         }
-        .refine(
-            (datas) => datas.dueDate >= datas.issueDate,
-            {
-                error: 'A data de vencimento não pode ser anterior a data de emissã',
-                path: ['dueDate']
-            
-            }
-        )
+    )
+    .refine(
+        (datas) => datas.dueDate >= datas.issueDate,
+        {
+            error: 'A data de vencimento não pode ser anterior a data de emissão.',
+            path: ['dueDate']
+        }
     );
 
 export type InvoiceInput = z.infer<typeof invoiceSchema>;
@@ -42,20 +46,21 @@ interface InvoiceFieldErrors {
     issueDate?: string;
     dueDate?: string;
 }
+
+function firstError(messages: string[] | undefined): string | undefined {
+    console.log(messages);
+    return !messages ? undefined : messages[0];
+}
+
 export function toFieldErrors(error: ZodError<InvoiceInput>): InvoiceFieldErrors {
-    const {
-        customerId,
-        amount,
-        status,
-        issueDate,
-        dueDate
-    } = z.flattenError(error);
+    const { fieldErrors } = z.flattenError(error);
+
 
     return {
-        customerId: customerId && customerId[0],
-        amount: amount && amount[0],
-        status: status && status[0],
-        issueDate: issueDate && issueDate[0],
-        dueDate: dueDate && dueDate[0]
+        customerId: firstError(fieldErrors.customerId),
+        amount: firstError(fieldErrors.amount),
+        status: firstError(fieldErrors.status),
+        issueDate: firstError(fieldErrors.issueDate),
+        dueDate: firstError(fieldErrors.dueDate)
     };
 }
